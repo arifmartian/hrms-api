@@ -10,4 +10,6 @@ export class CreateRoleDto {
     @MinLength(4, { message: 'Name must have atleast 4 characters.' })
     @IsNotEmpty()
     name: string;
+
+    status: string;
 }

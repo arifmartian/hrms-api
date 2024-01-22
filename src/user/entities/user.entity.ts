@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Role } from 'src/role/entities/role.entity';
 
-@Entity()
+@Entity({ name: 'users' })
 export class User {
 
     @PrimaryGeneratedColumn()

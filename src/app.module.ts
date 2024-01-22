@@ -17,7 +17,7 @@ import { User } from './user/entities/user.entity';
       username: 'postgres',
       entities: [User, Role],
       database: 'HRMS',
-      synchronize: true,
+      synchronize: true,  // Only for development, should be set to false in production
       logging: true,
     }),
     UserModule,

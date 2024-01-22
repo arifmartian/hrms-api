@@ -2,97 +2,115 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { responseCode } from "../services/response-helpers";
+const { SUCCESS, ERROR, NOTFOUND } = responseCode;
 
-@Controller('role')
+@Controller('api/role')
 export class RoleController {
   constructor(private readonly roleService: RoleService) { }
 
-  @Post()
+  @Post("/create")
   async create(@Body() createRoleDto: CreateRoleDto) {
-    const roleInserted = await this.roleService.createRole(createRoleDto);
-    let response: Object;
-    if (roleInserted) {
-      response = {
-        statusCode: 200,
-        status: true,
-        message: "Role inserted successfully",
-        data: roleInserted
+    try {
+      const roleInserted = await this.roleService.createRole(createRoleDto);
+      if (roleInserted) {
+        return {
+          status: true,
+          code: SUCCESS,
+          message: "Role added successfully",
+        }
+      } else {
+        return {
+          status: false,
+          code: ERROR,
+          message: "Something went wrong, please try again",
+        }
       }
-    } else {
-      response = {
-        statusCode: 500,
+    } catch (err) {
+      return {
         status: false,
-        message: "Something went wrong, please try again",
+        code: ERROR,
+        message: err.message,
       }
     }
-    return response;
   }
 
-  @Get()
+  @Get("/list")
   async findAll() {
-    const roleList = await this.roleService.findAllRole();
-    if (roleList) {
-      return {
-        statusCode: 200,
-        status: true,
-        message: "Role list fetched successfully",
-        data: roleList
+    try {
+      const roleList = await this.roleService.findAllRole();
+      if (roleList) {
+        return {
+          status: true,
+          code: SUCCESS,
+          message: "Role list fetched successfully",
+          data: roleList
+        }
+      } else {
+        return {
+          status: false,
+          code: NOTFOUND,
+          message: "No record found",
+        }
       }
-    } else {
+    } catch (err) {
       return {
-        statusCode: 404,
         status: false,
-        message: "No record found",
+        code: ERROR,
+        message: err.message,
       }
     }
   }
 
-  @Get(':id')
+  @Get('/:id')
   async findOne(@Param('id') id: string) {
-
-    const isRoleExist = await this.roleService.findOneRole(+id);
-    let response: object;
-    if (isRoleExist) {
-      response = {
-        statusCode: 200,
-        status: true,
-        message: "Role fetched successfully",
-        data: isRoleExist
+    try {
+      const isRoleExist = await this.roleService.findOneRole(+id); // type coercion
+      if (isRoleExist) {
+        return {
+          status: true,
+          code: SUCCESS,
+          message: "Role fetched successfully",
+          data: isRoleExist
+        }
+      } else {
+        return {
+          status: false,
+          code: NOTFOUND,
+          message: "Role not found"
+        }
       }
-    } else {
-      response = {
-        statusCode: 404,
+    } catch (err) {
+      return {
         status: false,
-        message: "Role not found"
+        code: ERROR,
+        message: err.message,
       }
     }
-    return response;
   }
 
-  @Patch(':id')
+  @Patch('/update/:id')
   async update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
-
-    const isRoleExist = await this.roleService.findOneRole(+id);
-    if (!isRoleExist) {
-      return {
-        statusCode: 404,
-        status: false,
-        message: "Role not found"
+    try {
+      const isRoleUpdated = await this.roleService.updateRole(+id, updateRoleDto);
+      if (isRoleUpdated) {
+        return {
+          status: true,
+          code: SUCCESS,
+          message: "Role updated successfully",
+        }
+      } else {
+        return {
+          status: false,
+          code: NOTFOUND,
+          message: "Role not found"
+        }
       }
-    }
-    const isRoleUpdated = await this.roleService.updateRole(+id, updateRoleDto);
-    if (isRoleUpdated) {
+    } catch (err) {
       return {
-        statusCode: 200,
-        status: true,
-        message: "Role updated successfully",
-        data: isRoleUpdated
-      }
-    } else {
-      return {
-        statusCode: 404,
         status: false,
-        message: "Role not found"
+        code: ERROR,
+        message: err.message,
       }
     }
   }
@@ -102,8 +120,8 @@ export class RoleController {
     const isRoleExist = await this.roleService.findOneRole(+id);
     if (!isRoleExist) {
       return {
-        statusCode: 404,
         status: false,
+        code: NOTFOUND,
         message: "Role not found"
       }
     }
@@ -111,8 +129,8 @@ export class RoleController {
     const isRoleDeleted = await this.roleService.removeRole(+id);
     if (isRoleDeleted) {
       return {
-        statusCode: 200,
         status: true,
+        code: SUCCESS,
         message: "Role deleted successfully",
       }
     }

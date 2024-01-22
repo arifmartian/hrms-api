@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 
-@Entity()
+@Entity({ name: 'roles' })  // table name
 export class Role {
 
     @PrimaryGeneratedColumn()
@@ -10,11 +10,8 @@ export class Role {
     @Column({ type: 'varchar', length: 15 })
     name: string;
 
-    // @Column({ nullable: true, default: new Date(), type: 'timestamp' })
-    // created_at: Date;
-
-    // @Column({ nullable: true, default: new Date(), type: 'timestamp' })
-    // updated_At: Date;
+    @Column({ type: 'enum', enum: ['ACTIVE', 'INACTIVE'], default: "ACTIVE" })
+    status: string;
 
     @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)", nullable: true })
     createdAt: Date;
@@ -22,6 +19,6 @@ export class Role {
     @UpdateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)", onUpdate: "CURRENT_TIMESTAMP(6)", nullable: true })
     updatedAt: Date;
 
-    @OneToMany(() => User, user => user.role)
+    @OneToMany(() => User, user => user.role)   // role relation with user table
     users: User[];
 }
